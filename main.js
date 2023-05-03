@@ -30,22 +30,22 @@ const objectMaterial = new THREE.MeshBasicMaterial({
 });
 
 async function renderObjects() {
-  const earth = await loadObject('/Earth.glb');
+  const earthScale = 40;
+  const earth = await loadObject('/Earth_Geo.gltf');
   earth.material = objectMaterial.clone();
-  earth.scale.set(20, 20, 20);
+  earth.scale.set(earthScale * 20, earthScale * 20, earthScale * 20);
   earth.material.opacity = 0;
   scene.add(earth);
 
-  vertices.earth = populateVertices(earth, particlesCount);
+  vertices.earth = populateVertices(earth, particlesCount, earthScale);
 
   const brain = await loadObject('/brain.glb');
   const scale = 1.5;
   brain.material = objectMaterial.clone();
   brain.scale.set(scale, scale, scale);
-  brain.position.y -= 90;
   scene.add(brain);
 
-  vertices.brain = populateVertices(brain, particlesCount, scale, 0, -60, 0);
+  vertices.brain = populateVertices(brain, particlesCount, scale);
   vertices.main = vertices.brain;
 
   cloud = renderPointsCloud(vertices.main, vertices.earth);
@@ -56,9 +56,24 @@ async function renderObjects() {
     .max(1)
     .min(0)
     .step(0.01)
+    .name('Morph')
     .onChange(value => {
       brain.material.opacity = (1 - value) * 0.05;
       earth.material.opacity = value * 0.05;
+    });
+
+  gui
+    .add(cloud.material.uniforms.uDestruction, 'value')
+    .max(400)
+    .min(0)
+    .step(0.01)
+    .name('Destruction')
+    .onChange(value => {
+      const opacity = cloud.material.uniforms.uTransformationFactor.value;
+      if (value <= 20) {
+        brain.material.opacity = (1 - opacity) * 0.05;
+        earth.material.opacity = opacity * 0.05;
+      } else brain.material.opacity = earth.material.opacity;
     });
 }
 
@@ -115,15 +130,7 @@ function populateVertices(
 
 function generateColors() {
   const colors = [];
-
-  const factor = Math.floor(particlesCount / 4);
-
-  for (let i = 0; i < particlesCount; i++) {
-    if (i <= factor) colors.push(1, 0, 0);
-    else if (i <= factor * 2) colors.push(0, 1, 0);
-    else if (i <= factor * 3) colors.push(0, 0, 1);
-    else colors.push(1, 0, 1);
-  }
+  for (let i = 0; i < particlesCount; i++) colors.push(1, 0, 1);
 
   return colors;
 }
@@ -140,6 +147,14 @@ async function loadObject(url) {
   return model.scene.children[0];
 }
 
+function generateRandomArr(length) {
+  const arr = [];
+  for (let i = 0; i < length; i++)
+    arr.push(Math.random(), Math.random(), Math.random());
+
+  return arr;
+}
+
 function renderPointsCloud(vertices, secondaryVertices) {
   const geometry = new THREE.BufferGeometry();
 
@@ -153,9 +168,15 @@ function renderPointsCloud(vertices, secondaryVertices) {
     new THREE.Float32BufferAttribute(secondaryVertices, 3)
   );
 
-  const colors = generateColors();
+  geometry.setAttribute(
+    'aColor',
+    new THREE.Float32BufferAttribute(generateColors(), 3)
+  );
 
-  geometry.setAttribute('aColor', new THREE.Float32BufferAttribute(colors, 3));
+  geometry.setAttribute(
+    'aRandom',
+    new THREE.Float32BufferAttribute(generateRandomArr(particlesCount), 3)
+  );
 
   const textureLoader = new THREE.TextureLoader();
   const texture = textureLoader.load('/1.png');
@@ -173,6 +194,7 @@ function renderPointsCloud(vertices, secondaryVertices) {
       uTexture: { value: texture },
       uColor: { value: new THREE.Vector3(0) },
       uTransformationFactor: { value: 0 },
+      uDestruction: { value: 0 },
     },
 
     depthTest: false,
