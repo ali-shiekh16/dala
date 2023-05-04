@@ -20,7 +20,7 @@ const vertices = {
 };
 
 let cloud = null;
-const particlesCount = 1500;
+const particlesCount = 2500;
 
 const objectMaterial = new THREE.MeshBasicMaterial({
   wireframe: true,
@@ -30,51 +30,90 @@ const objectMaterial = new THREE.MeshBasicMaterial({
 });
 
 async function renderObjects() {
-  const earthScale = 40;
+  // temp code
+  const earthScale = 600;
   const earth = await loadObject('/Earth_Geo.gltf');
   earth.material = objectMaterial.clone();
-  earth.scale.set(earthScale * 20, earthScale * 20, earthScale * 20);
+  earth.scale.set(earthScale, earthScale, earthScale);
   earth.material.opacity = 0;
   scene.add(earth);
 
   vertices.earth = populateVertices(earth, particlesCount, earthScale);
 
-  const brain = await loadObject('/brain.glb');
-  const scale = 1.5;
-  brain.material = objectMaterial.clone();
-  brain.scale.set(scale, scale, scale);
-  scene.add(brain);
+  const geometry = earth.geometry;
+  const material = new THREE.PointsMaterial({
+    color: 'red',
+    size: 6,
+    sizeAttenuation: true,
+  });
 
-  vertices.brain = populateVertices(brain, particlesCount, scale);
-  vertices.main = vertices.brain;
+  const points = new THREE.Points(geometry, material);
+  points.scale.set(700, 700, 700);
+  points.position.setZ(200);
+  scene.add(points);
 
-  cloud = renderPointsCloud(vertices.main, vertices.earth);
+  const sphere = new THREE.Points(
+    new THREE.SphereGeometry(180, 35, 35),
+    new THREE.PointsMaterial({
+      color: 'red',
+      size: 2,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0.5,
+    })
+  );
 
-  const gui = new dat.GUI();
-  gui
-    .add(cloud.material.uniforms.uTransformationFactor, 'value')
-    .max(1)
-    .min(0)
-    .step(0.01)
-    .name('Morph')
-    .onChange(value => {
-      brain.material.opacity = (1 - value) * 0.05;
-      earth.material.opacity = value * 0.05;
-    });
+  scene.add(sphere);
 
-  gui
-    .add(cloud.material.uniforms.uDestruction, 'value')
-    .max(400)
-    .min(0)
-    .step(0.01)
-    .name('Destruction')
-    .onChange(value => {
-      const opacity = cloud.material.uniforms.uTransformationFactor.value;
-      if (value <= 20) {
-        brain.material.opacity = (1 - opacity) * 0.05;
-        earth.material.opacity = opacity * 0.05;
-      } else brain.material.opacity = earth.material.opacity;
-    });
+  // cloud = renderPointsCloud(vertices.earth, vertices.earth);
+  // temp end
+
+  // const earthScale = 600;
+  // const earth = await loadObject('/Earth_Geo.gltf');
+  // earth.material = objectMaterial.clone();
+  // earth.scale.set(earthScale, earthScale, earthScale);
+  // earth.material.opacity = 0;
+  // scene.add(earth);
+
+  // vertices.earth = populateVertices(earth, particlesCount, earthScale);
+  // cloud = renderPointsCloud(vertices.earth, vertices.earth);
+
+  // const brain = await loadObject('/brain.glb');
+  // const scale = 1.5;
+  // brain.material = objectMaterial.clone();
+  // brain.scale.set(scale, scale, scale);
+  // scene.add(brain);
+
+  // vertices.brain = populateVertices(brain, particlesCount, scale);
+  // vertices.main = vertices.brain;
+
+  // cloud = renderPointsCloud(vertices.main, vertices.earth);
+
+  // const gui = new dat.GUI();
+  // gui
+  //   .add(cloud.material.uniforms.uTransformationFactor, 'value')
+  //   .max(1)
+  //   .min(0)
+  //   .step(0.01)
+  //   .name('Morph')
+  //   .onChange(value => {
+  //     // brain.material.opacity = (1 - value) * 0.05;
+  //     // earth.material.opacity = value * 0.05;
+  //   });
+
+  // gui
+  //   .add(cloud.material.uniforms.uDestruction, 'value')
+  //   .max(400)
+  //   .min(0)
+  //   .step(0.01)
+  //   .name('Destruction')
+  //   .onChange(value => {
+  //     const opacity = cloud.material.uniforms.uTransformationFactor.value;
+  //     if (value <= 20) {
+  //       brain.material.opacity = (1 - opacity) * 0.05;
+  //       earth.material.opacity = opacity * 0.05;
+  //     } else brain.material.opacity = earth.material.opacity;
+  //   });
 }
 
 renderObjects();
@@ -143,6 +182,8 @@ async function loadObject(url) {
   } catch (ex) {
     console.log(ex.message);
   }
+
+  console.log(model.scene);
 
   return model.scene.children[0];
 }
