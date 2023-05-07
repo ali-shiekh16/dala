@@ -7,85 +7,100 @@ import scene from './scene';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler';
-import fragmentShader from './shaders/fragment.glsl';
-import vertexShader from './shaders/vertex.glsl';
+// import fragmentShader from './shaders/fragment.glsl';
+// import vertexShader from './shaders/vertex.glsl';
+import frag from './shaders/frag.glsl';
+import vert from './shaders/vert.glsl';
+
 import dat from 'dat.gui';
 
 const { sizes } = configs;
 
-const vertices = {
-  main: [],
-  brain: [],
-  earth: [],
-};
-
-let cloud = null;
 const particlesCount = 2500;
 
-const objectMaterial = new THREE.MeshBasicMaterial({
-  wireframe: true,
-  color: 0xffffff,
-  transparent: true,
-  opacity: 0.05,
-});
+async function getGlobeGeometry() {
+  // land shell
+  const earth = await loadObject('/Earth_Geo.gltf');
+  const earthGeometry = earth.geometry;
+  earthGeometry.scale(700, 700, 700);
+  earthGeometry.translate(0, 0, 200);
 
-async function renderObjects() {
-  //!temp code
+  // sphere
+  const sphereGeometry = new THREE.SphereGeometry(185, 35, 35);
 
+  const combined = [
+    ...earthGeometry.attributes.position.array,
+    ...sphereGeometry.attributes.position.array,
+  ];
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute(combined, 3)
+  );
+
+  return geometry;
+}
+
+async function getBrainGeometry() {
   const group = await loadObject('brain/Brain1.gltf');
 
-  const brainScale = 30;
   const brain = group.children[1];
-  brain.material = objectMaterial.clone();
-  brain.scale.set(brainScale, brainScale, brainScale);
-  scene.add(brain);
-  // const scale = 1.5;
-  // brain.material = objectMaterial.clone();
-  // brain.scale.set(scale, scale, scale);
+  brain.geometry.scale(30, 30, 30);
 
-  const geometry = brain.geometry;
-  const material = new THREE.PointsMaterial({
-    color: 'red',
-    size: 6,
-    sizeAttenuation: true,
+  // const geometry = new THREE.BufferGeometry();
+
+  // geometry.setAttribute(
+  //   'position',
+  //   new THREE.BufferAttribute(brain.geometry.attributes.position.array, 3)
+  // );
+
+  return brain.geometry;
+}
+
+async function renderObjects() {
+  const globeGeometry = await getGlobeGeometry();
+
+  const brainGeometry = await getBrainGeometry();
+
+  globeGeometry.setAttribute(
+    'secondaryPosition',
+    new THREE.BufferAttribute(brainGeometry.attributes.position.array, 3)
+  );
+
+  const material = new THREE.ShaderMaterial({
+    extensions: {
+      derivatives: '#extension GL_OES_standard_derivatives: enable',
+    },
+    depthWrite: false,
+    vertexShader: vert,
+    fragmentShader: frag,
+    uniforms: {
+      uSize: { value: 12 },
+      uTexture: { value: new THREE.TextureLoader().load('/1.png') },
+      uColor: { value: new THREE.Vector3(1, 0, 0) },
+      uTransformationFactor: { value: 0 },
+      // uDestruction: { value: 0 },
+    },
+    depthTest: false,
+    transparent: true,
   });
 
-  const points = new THREE.Points(geometry, material);
-  points.scale.set(brainScale, brainScale, brainScale);
+  const points = new THREE.Points(globeGeometry, material);
 
   scene.add(points);
 
-  //!end temp code
-
-  // const earthScale = 600;
-  // const earth = await loadObject('/Earth_Geo.gltf');
-  // earth.material = objectMaterial.clone();
-  // earth.scale.set(earthScale, earthScale, earthScale);
-  // earth.material.opacity = 0;
-  // scene.add(earth);
-  // vertices.earth = populateVertices(earth, particlesCount, earthScale);
-  // cloud = renderPointsCloud(vertices.earth, vertices.earth);
-
-  // const brain = await loadObject('/brain.glb');
-  // const scale = 1.5;
-  // brain.material = objectMaterial.clone();
-  // brain.scale.set(scale, scale, scale);
-  // scene.add(brain);
-
-  // const geometry = brain.geometry;
-  // const material = new THREE.PointsMaterial({
-  //   color: 'red',
-  //   size: 6,
-  //   sizeAttenuation: true,
+  const gui = new dat.GUI();
+  gui
+    .add(material.uniforms.uTransformationFactor, 'value')
+    .max(1)
+    .min(0)
+    .step(0.01)
+    .name('Morph');
+  // .onChange(value => {
+  //   // brain.material.opacity = (1 - value) * 0.05;
+  //   // earth.material.opacity = value * 0.05;
   // });
 
-  // const points = new THREE.Points(geometry, material);
-
-  // scene.add(points);
-
-  // vertices.brain = populateVertices(brain, particlesCount, scale);
-  // vertices.main = vertices.brain;
-  // cloud = renderPointsCloud(vertices.main, vertices.earth);
   // const gui = new dat.GUI();
   // gui
   //   .add(cloud.material.uniforms.uTransformationFactor, 'value')
