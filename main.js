@@ -7,8 +7,7 @@ import scene from './scene';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler';
-// import fragmentShader from './shaders/fragment.glsl';
-// import vertexShader from './shaders/vertex.glsl';
+import WebGL from 'three/examples/jsm/capabilities/WebGL';
 import frag from './shaders/frag.glsl';
 import vert from './shaders/vert.glsl';
 
@@ -17,6 +16,14 @@ import dat from 'dat.gui';
 const { sizes } = configs;
 
 const particlesCount = 2500;
+
+function main() {
+  if (!WebGL.isWebGLAvailable()) return alert(WebGL.getErrorMessage());
+
+  renderObjects();
+}
+
+main();
 
 async function getGlobeGeometry() {
   // land shell
@@ -126,8 +133,6 @@ async function renderObjects() {
   //     } else brain.material.opacity = earth.material.opacity;
   //   });
 }
-
-renderObjects();
 
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.render(scene, camera);
