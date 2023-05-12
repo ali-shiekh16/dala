@@ -21,21 +21,14 @@ renderObjects();
 async function getGlobeGeometry() {
   // land shell
   const earth = await loadObject('/map.glb');
+
   const earthGeometry = earth.geometry;
 
-  const scale = 1700;
+  const scale = 100;
   earthGeometry.scale(scale, scale, scale);
 
-  earthGeometry.translate(0, 0, 350);
-  // scene.add(earth);
+  earthGeometry.translate(0, 0, 10);
 
-  // sphere
-  // const sphereGeometry = new THREE.SphereGeometry(185, 35, 35);
-
-  // const combined = [
-  //   ...earthGeometry.attributes.position.array,
-  //   ...sphereGeometry.attributes.position.array,
-  // ];
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute(
     'position',

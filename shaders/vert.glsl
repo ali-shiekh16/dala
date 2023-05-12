@@ -18,6 +18,6 @@ void main() {
 
 	gl_Position = projectedPosition;
 
-  gl_PointSize = uSize * 500.0;
+  gl_PointSize = uSize * 260.0;
   gl_PointSize *= (1.0 / -viewPosition.z);
 }
