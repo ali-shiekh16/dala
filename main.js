@@ -7,7 +7,6 @@ import scene from './scene';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler';
-import WebGL from 'three/examples/jsm/capabilities/WebGL';
 import frag from './shaders/frag.glsl';
 import vert from './shaders/vert.glsl';
 
@@ -17,32 +16,30 @@ const { sizes } = configs;
 
 const particlesCount = 2500;
 
-function main() {
-  if (!WebGL.isWebGLAvailable()) return alert(WebGL.getErrorMessage());
-
-  renderObjects();
-}
-
-main();
+renderObjects();
 
 async function getGlobeGeometry() {
   // land shell
-  const earth = await loadObject('/Earth_Geo.gltf');
+  const earth = await loadObject('/map.glb');
   const earthGeometry = earth.geometry;
-  earthGeometry.scale(700, 700, 700);
-  earthGeometry.translate(0, 0, 200);
+
+  const scale = 1700;
+  earthGeometry.scale(scale, scale, scale);
+
+  earthGeometry.translate(0, 0, 350);
+  // scene.add(earth);
 
   // sphere
-  const sphereGeometry = new THREE.SphereGeometry(185, 35, 35);
+  // const sphereGeometry = new THREE.SphereGeometry(185, 35, 35);
 
-  const combined = [
-    ...earthGeometry.attributes.position.array,
-    ...sphereGeometry.attributes.position.array,
-  ];
+  // const combined = [
+  //   ...earthGeometry.attributes.position.array,
+  //   ...sphereGeometry.attributes.position.array,
+  // ];
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute(
     'position',
-    new THREE.Float32BufferAttribute(combined, 3)
+    new THREE.Float32BufferAttribute(earthGeometry.attributes.position.array, 3)
   );
 
   return geometry;
@@ -54,13 +51,6 @@ async function getBrainGeometry() {
   const brain = group.children[1];
   brain.geometry.scale(30, 30, 30);
 
-  // const geometry = new THREE.BufferGeometry();
-
-  // geometry.setAttribute(
-  //   'position',
-  //   new THREE.BufferAttribute(brain.geometry.attributes.position.array, 3)
-  // );
-
   return brain.geometry;
 }
 
@@ -69,6 +59,10 @@ async function renderObjects() {
 
   const brainGeometry = await getBrainGeometry();
 
+  globeGeometry.setAttribute(
+    'position',
+    new THREE.BufferAttribute(globeGeometry.attributes.position.array, 3)
+  );
   globeGeometry.setAttribute(
     'secondaryPosition',
     new THREE.BufferAttribute(brainGeometry.attributes.position.array, 3)
@@ -82,7 +76,7 @@ async function renderObjects() {
     vertexShader: vert,
     fragmentShader: frag,
     uniforms: {
-      uSize: { value: 12 },
+      uSize: { value: 10 },
       uTexture: { value: new THREE.TextureLoader().load('/1.png') },
       uColor: { value: new THREE.Vector3(1, 0, 0) },
       uTransformationFactor: { value: 0 },
@@ -95,6 +89,11 @@ async function renderObjects() {
   const points = new THREE.Points(globeGeometry, material);
 
   scene.add(points);
+
+  // const pointsMaterial = new THREE.PointsMaterial({
+  //   size: 2,
+  //   color: 0xff00ff,
+  // });
 
   const gui = new dat.GUI();
   gui
@@ -245,7 +244,7 @@ function renderPointsCloud(vertices, secondaryVertices) {
     vertexShader,
     fragmentShader,
     uniforms: {
-      uSize: { value: 12 },
+      uSize: { value: 15 },
       uTexture: { value: texture },
       uColor: { value: new THREE.Vector3(0) },
       uTransformationFactor: { value: 0 },
