@@ -69,7 +69,7 @@ async function renderObjects() {
     vertexShader: vert,
     fragmentShader: frag,
     uniforms: {
-      uSize: { value: 10 },
+      uSize: { value: 20 },
       uTexture: { value: new THREE.TextureLoader().load('/1.png') },
       uColor: { value: new THREE.Vector3(1, 0, 0) },
       uTransformationFactor: { value: 0 },
