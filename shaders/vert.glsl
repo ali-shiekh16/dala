@@ -4,6 +4,7 @@ uniform float uSize;
 uniform float uTransformationFactor;
 
 varying vec3 vColor;
+varying float vVisible;
 
 void main() {
 
@@ -18,6 +19,11 @@ void main() {
 
 	gl_Position = projectedPosition;
 
-  gl_PointSize = uSize * 260.0;
+
+	vec3 vNormal = normalize( normalMatrix * normal);
+	vec3 vDir = vec3(0, 0, 1);
+	vVisible = step( 0., dot( vDir, vNormal ) );
+	
+  gl_PointSize = uSize * 60.0;
   gl_PointSize *= (1.0 / -viewPosition.z);
 }

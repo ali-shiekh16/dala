@@ -20,19 +20,25 @@ renderObjects();
 
 async function getGlobeGeometry() {
   // land shell
-  const earth = await loadObject('/map.glb');
+  const earth = await loadObject('/map1.glb');
 
   const earthGeometry = earth.geometry;
 
-  const scale = 100;
+  const scale = 150;
   earthGeometry.scale(scale, scale, scale);
 
   earthGeometry.translate(0, 0, 10);
 
   const geometry = new THREE.BufferGeometry();
+
   geometry.setAttribute(
     'position',
     new THREE.Float32BufferAttribute(earthGeometry.attributes.position.array, 3)
+  );
+
+  geometry.setAttribute(
+    'normal',
+    new THREE.Float32BufferAttribute(earthGeometry.attributes.normal.array, 3)
   );
 
   return geometry;
@@ -69,8 +75,8 @@ async function renderObjects() {
     vertexShader: vert,
     fragmentShader: frag,
     uniforms: {
-      uSize: { value: 20 },
-      uTexture: { value: new THREE.TextureLoader().load('/1.png') },
+      uSize: { value: 50 },
+      uTexture: { value: new THREE.TextureLoader().load('/triangle.png') },
       uColor: { value: new THREE.Vector3(1, 0, 0) },
       uTransformationFactor: { value: 0 },
       // uDestruction: { value: 0 },
@@ -88,42 +94,13 @@ async function renderObjects() {
   //   color: 0xff00ff,
   // });
 
-  const gui = new dat.GUI();
-  gui
-    .add(material.uniforms.uTransformationFactor, 'value')
-    .max(1)
-    .min(0)
-    .step(0.01)
-    .name('Morph');
-  // .onChange(value => {
-  //   // brain.material.opacity = (1 - value) * 0.05;
-  //   // earth.material.opacity = value * 0.05;
-  // });
-
   // const gui = new dat.GUI();
   // gui
-  //   .add(cloud.material.uniforms.uTransformationFactor, 'value')
+  //   .add(material.uniforms.uTransformationFactor, 'value')
   //   .max(1)
   //   .min(0)
   //   .step(0.01)
-  //   .name('Morph')
-  //   .onChange(value => {
-  //     // brain.material.opacity = (1 - value) * 0.05;
-  //     // earth.material.opacity = value * 0.05;
-  //   });
-  // gui
-  //   .add(cloud.material.uniforms.uDestruction, 'value')
-  //   .max(400)
-  //   .min(0)
-  //   .step(0.01)
-  //   .name('Destruction')
-  //   .onChange(value => {
-  //     const opacity = cloud.material.uniforms.uTransformationFactor.value;
-  //     if (value <= 20) {
-  //       brain.material.opacity = (1 - opacity) * 0.05;
-  //       earth.material.opacity = opacity * 0.05;
-  //     } else brain.material.opacity = earth.material.opacity;
-  //   });
+  //   .name('Morph');
 }
 
 const controls = new OrbitControls(camera, renderer.domElement);
