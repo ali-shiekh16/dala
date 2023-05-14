@@ -45,12 +45,29 @@ async function getGlobeGeometry() {
 }
 
 async function getBrainGeometry() {
-  const group = await loadObject('brain/Brain1.gltf');
+  const group = await loadObject('Brain.glb');
 
   const brain = group.children[1];
-  brain.geometry.scale(30, 30, 30);
 
-  return brain.geometry;
+  const scale = 2000;
+  brain.geometry.scale(scale, scale, scale);
+
+  const geometry = new THREE.BufferGeometry();
+
+  geometry.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute(
+      brain.geometry.attributes.position.array,
+      3
+    )
+  );
+
+  geometry.setAttribute(
+    'normal',
+    new THREE.Float32BufferAttribute(brain.geometry.attributes.normal.array, 3)
+  );
+
+  return geometry;
 }
 
 async function renderObjects() {
@@ -85,7 +102,7 @@ async function renderObjects() {
     transparent: true,
   });
 
-  const points = new THREE.Points(globeGeometry, material);
+  const points = new THREE.Points(brainGeometry, material);
 
   scene.add(points);
 
