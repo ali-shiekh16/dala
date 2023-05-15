@@ -47,9 +47,9 @@ async function getGlobeGeometry() {
 async function getBrainGeometry() {
   const group = await loadObject('Brain.glb');
 
-  const brain = group.children[1];
+  const brain = group.children[0];
 
-  const scale = 2000;
+  const scale = 3000;
   brain.geometry.scale(scale, scale, scale);
 
   const geometry = new THREE.BufferGeometry();
