@@ -45,7 +45,7 @@ async function getGlobeGeometry() {
 }
 
 async function getBrainGeometry() {
-  const group = await loadObject('Brain.glb');
+  const group = await loadObject('brain.glb');
 
   const brain = group.children[0];
 
