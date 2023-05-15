@@ -49,7 +49,7 @@ async function getBrainGeometry() {
 
   const brain = group.children[0];
 
-  const scale = 3000;
+  const scale = 1500;
   brain.geometry.scale(scale, scale, scale);
 
   const geometry = new THREE.BufferGeometry();
@@ -102,7 +102,7 @@ async function renderObjects() {
     transparent: true,
   });
 
-  const points = new THREE.Points(brainGeometry, material);
+  const points = new THREE.Points(globeGeometry, material);
 
   scene.add(points);
 
@@ -111,13 +111,13 @@ async function renderObjects() {
   //   color: 0xff00ff,
   // });
 
-  // const gui = new dat.GUI();
-  // gui
-  //   .add(material.uniforms.uTransformationFactor, 'value')
-  //   .max(1)
-  //   .min(0)
-  //   .step(0.01)
-  //   .name('Morph');
+  const gui = new dat.GUI();
+  gui
+    .add(material.uniforms.uTransformationFactor, 'value')
+    .max(1)
+    .min(0)
+    .step(0.01)
+    .name('Morph');
 }
 
 const controls = new OrbitControls(camera, renderer.domElement);
