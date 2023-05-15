@@ -1,4 +1,5 @@
 attribute vec3 secondaryPosition;
+attribute vec3 secondaryNormal;
 
 uniform float uSize;
 uniform float uTransformationFactor;
@@ -19,8 +20,7 @@ void main() {
 
 	gl_Position = projectedPosition;
 
-
-	vec3 vNormal = normalize( normalMatrix * normal);
+	vec3 vNormal = normalize( normalMatrix * mix(normal, secondaryNormal, uTransformationFactor));
 	vec3 vDir = vec3(0, 0, 1);
 	vVisible = step( 0., dot( vDir, vNormal ) );
 	

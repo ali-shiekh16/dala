@@ -49,7 +49,9 @@ async function getBrainGeometry() {
 
   const brain = group.children[0];
 
-  const scale = 1500;
+  // console.log(brain);
+
+  const scale = 2000;
   brain.geometry.scale(scale, scale, scale);
 
   const geometry = new THREE.BufferGeometry();
@@ -82,6 +84,11 @@ async function renderObjects() {
   globeGeometry.setAttribute(
     'secondaryPosition',
     new THREE.BufferAttribute(brainGeometry.attributes.position.array, 3)
+  );
+
+  globeGeometry.setAttribute(
+    'secondaryNormal',
+    new THREE.BufferAttribute(brainGeometry.attributes.normal.array, 3)
   );
 
   const material = new THREE.ShaderMaterial({
