@@ -77,18 +77,26 @@ async function renderObjects() {
 
   const brainGeometry = await getBrainGeometry();
 
-  globeGeometry.setAttribute(
+  const geometry = new THREE.BufferGeometry();
+
+  geometry.setAttribute(
     'position',
-    new THREE.BufferAttribute(globeGeometry.attributes.position.array, 3)
-  );
-  globeGeometry.setAttribute(
-    'secondaryPosition',
     new THREE.BufferAttribute(brainGeometry.attributes.position.array, 3)
   );
 
-  globeGeometry.setAttribute(
-    'secondaryNormal',
+  geometry.setAttribute(
+    'normal',
     new THREE.BufferAttribute(brainGeometry.attributes.normal.array, 3)
+  );
+
+  geometry.setAttribute(
+    'secondaryPosition',
+    new THREE.BufferAttribute(globeGeometry.attributes.position.array, 3)
+  );
+
+  geometry.setAttribute(
+    'secondaryNormal',
+    new THREE.BufferAttribute(globeGeometry.attributes.normal.array, 3)
   );
 
   const material = new THREE.ShaderMaterial({
@@ -109,7 +117,7 @@ async function renderObjects() {
     transparent: true,
   });
 
-  const points = new THREE.Points(globeGeometry, material);
+  const points = new THREE.Points(geometry, material);
 
   scene.add(points);
 
