@@ -1,4 +1,4 @@
-import './style.css';
+import './style.scss';
 import * as THREE from 'three';
 import camera, { updateCamera } from './camera';
 import configs from './configuration';
@@ -9,12 +9,12 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler';
 import frag from './shaders/frag.glsl';
 import vert from './shaders/vert.glsl';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/src/ScrollTrigger';
 
 import dat from 'dat.gui';
 
 const { sizes } = configs;
-
-const particlesCount = 2500;
 
 renderObjects();
 
@@ -39,6 +39,15 @@ async function getGlobeGeometry() {
   geometry.setAttribute(
     'normal',
     new THREE.Float32BufferAttribute(earthGeometry.attributes.normal.array, 3)
+  );
+
+  const random = [];
+  for (let i = 0; i < earthGeometry.attributes.position.array.length / 3; i++)
+    random.push(Math.random(), Math.random(), Math.random());
+
+  geometry.setAttribute(
+    'aRand',
+    new THREE.Float32BufferAttribute(new Float32Array(random), 3)
   );
 
   return geometry;
@@ -67,6 +76,15 @@ async function getBrainGeometry() {
   geometry.setAttribute(
     'normal',
     new THREE.Float32BufferAttribute(brain.geometry.attributes.normal.array, 3)
+  );
+
+  const random = [];
+  for (let i = 0; i < brain.geometry.attributes.position.array.length / 3; i++)
+    random.push(Math.random(), Math.random(), Math.random());
+
+  geometry.setAttribute(
+    'aRand',
+    new THREE.Float32BufferAttribute(new Float32Array(random), 3)
   );
 
   return geometry;
@@ -99,6 +117,16 @@ async function renderObjects() {
     new THREE.BufferAttribute(globeGeometry.attributes.normal.array, 3)
   );
 
+  geometry.setAttribute(
+    'aRand',
+    new THREE.BufferAttribute(brainGeometry.attributes.aRand.array, 3)
+  );
+
+  geometry.setAttribute(
+    'aRandSecondary',
+    new THREE.BufferAttribute(globeGeometry.attributes.aRand.array, 3)
+  );
+
   const material = new THREE.ShaderMaterial({
     extensions: {
       derivatives: '#extension GL_OES_standard_derivatives: enable',
@@ -111,19 +139,112 @@ async function renderObjects() {
       uTexture: { value: new THREE.TextureLoader().load('/triangle.png') },
       uColor: { value: new THREE.Vector3(1, 0, 0) },
       uTransformationFactor: { value: 0 },
-      // uDestruction: { value: 0 },
+      uDestruction: { value: 0 },
     },
     depthTest: false,
     transparent: true,
   });
 
   const points = new THREE.Points(geometry, material);
+  points.rotateY(-Math.PI / 2);
+  points.position.setX(150);
 
   scene.add(points);
 
-  // const pointsMaterial = new THREE.PointsMaterial({
-  //   size: 2,
-  //   color: 0xff00ff,
+  gsap.registerPlugin(ScrollTrigger);
+
+  let section = 0;
+  gsap
+    .timeline({
+      ease: 'slow',
+      scrollTrigger: {
+        trigger: '.wrapper',
+        start: 'top top',
+        end: '100% top',
+        scrub: 4,
+      },
+    })
+    .to(points.position, {
+      x: -150,
+    })
+    .to(
+      points.rotation,
+      {
+        y: Math.PI / 2,
+      },
+      '<'
+    )
+    .to(points.position, {
+      x: 0,
+    })
+    .to(
+      points.rotation,
+      {
+        y: -Math.PI / 10,
+      },
+      '<'
+    )
+    .to(material.uniforms.uDestruction, {
+      value: 1,
+    })
+    .to(
+      points.position,
+      {
+        x: -150,
+        y: -150,
+      },
+      '<'
+    )
+    .to(points.position, {
+      x: 0,
+      y: 0,
+    })
+    .to(
+      material.uniforms.uDestruction,
+      {
+        value: 0,
+      },
+      '<'
+    )
+    .to(
+      material.uniforms.uTransformationFactor,
+      {
+        value: 1,
+      },
+      '<'
+    )
+    .to(points.rotation, {
+      y: -Math.PI / 3,
+    })
+    .to(
+      points.position,
+      {
+        x: -150,
+      },
+      '<'
+    )
+    .to(points.position, {
+      x: -150,
+    })
+    .to(points.position, {
+      x: 0,
+    });
+  // .to(points.position, {
+  //   x: 0,
+  // });
+  // .to(points.position, {
+  //   x: 0,
+  //   y: 0,
+  // });
+
+  // .to(points.position, {
+  //   x: 0,
+  //   scrollTrigger: {
+  //     trigger: '#section-2',
+  //     start: 'top top',
+  //     scrub: 4,
+  //     markers: true,
+  //   },
   // });
 
   const gui = new dat.GUI();
@@ -133,6 +254,15 @@ async function renderObjects() {
     .min(0)
     .step(0.01)
     .name('Morph');
+
+  gui
+    .add(material.uniforms.uDestruction, 'value')
+    .max(1)
+    .min(0)
+    .step(0.01)
+    .name('Destruction');
+
+  gui.hide();
 }
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -160,37 +290,6 @@ window.addEventListener('resize', () => {
 
 window.addEventListener('dblclick', handleFullScreen);
 
-function populateVertices(
-  mesh,
-  count,
-  scale = 1,
-  xOffset = 0,
-  yOffset = 0,
-  zOffset = 0
-) {
-  const vertices = [];
-
-  const sampler = new MeshSurfaceSampler(mesh).build();
-  const tempPosition = new THREE.Vector3();
-  for (let i = 0; i < count; i++) {
-    sampler.sample(tempPosition);
-    vertices.push(
-      (tempPosition.x + xOffset) * scale,
-      (tempPosition.y + yOffset) * scale,
-      (tempPosition.z + zOffset) * scale
-    );
-  }
-
-  return vertices;
-}
-
-function generateColors() {
-  const colors = [];
-  for (let i = 0; i < particlesCount; i++) colors.push(1, 0, 1);
-
-  return colors;
-}
-
 async function loadObject(url) {
   let model = null;
   try {
@@ -201,65 +300,4 @@ async function loadObject(url) {
   }
 
   return model.scene.children[0];
-}
-
-function generateRandomArr(length) {
-  const arr = [];
-  for (let i = 0; i < length; i++)
-    arr.push(Math.random(), Math.random(), Math.random());
-
-  return arr;
-}
-
-function renderPointsCloud(vertices, secondaryVertices) {
-  const geometry = new THREE.BufferGeometry();
-
-  geometry.setAttribute(
-    'position',
-    new THREE.Float32BufferAttribute(vertices, 3)
-  );
-
-  geometry.setAttribute(
-    'secondaryPosition',
-    new THREE.Float32BufferAttribute(secondaryVertices, 3)
-  );
-
-  geometry.setAttribute(
-    'aColor',
-    new THREE.Float32BufferAttribute(generateColors(), 3)
-  );
-
-  geometry.setAttribute(
-    'aRandom',
-    new THREE.Float32BufferAttribute(generateRandomArr(particlesCount), 3)
-  );
-
-  const textureLoader = new THREE.TextureLoader();
-  const texture = textureLoader.load('/1.png');
-
-  const material = new THREE.ShaderMaterial({
-    extensions: {
-      derivatives: '#extension GL_OES_standard_derivatives: enable',
-    },
-    depthWrite: false,
-    color: 0xff0000,
-    vertexShader,
-    fragmentShader,
-    uniforms: {
-      uSize: { value: 15 },
-      uTexture: { value: texture },
-      uColor: { value: new THREE.Vector3(0) },
-      uTransformationFactor: { value: 0 },
-      uDestruction: { value: 0 },
-    },
-
-    depthTest: false,
-    transparent: true,
-  });
-
-  const points = new THREE.Points(geometry, material);
-
-  scene.add(points);
-
-  return points;
 }

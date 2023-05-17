@@ -1,11 +1,19 @@
 attribute vec3 secondaryPosition;
 attribute vec3 secondaryNormal;
+attribute vec3 aRand;
+attribute vec3 aRandSecondary;
 
 uniform float uSize;
 uniform float uTransformationFactor;
+uniform float uDestruction;
 
 varying vec3 vColor;
 varying float vVisible;
+
+float random (vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+}
+
 
 void main() {
 
@@ -14,9 +22,12 @@ void main() {
 	vec4 modelPositionB = modelMatrix * vec4(secondaryPosition, 1.0);
 
 	vec4 modelPosition = mix(modelPositionA, modelPositionB, uTransformationFactor); 
+	modelPosition.xyz += aRand.xyz * 850.0 * uDestruction;
+
 
 	vec4 viewPosition = viewMatrix * modelPosition;
 	vec4 projectedPosition = projectionMatrix * viewPosition;
+
 
 	gl_Position = projectedPosition;
 
