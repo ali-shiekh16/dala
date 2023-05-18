@@ -310,8 +310,6 @@ window.addEventListener('resize', () => {
   renderer.render(scene, camera);
 });
 
-window.addEventListener('dblclick', handleFullScreen);
-
 async function loadObject(url) {
   let model = null;
   try {
