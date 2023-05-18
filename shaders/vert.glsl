@@ -2,6 +2,7 @@ attribute vec3 secondaryPosition;
 attribute vec3 secondaryNormal;
 attribute vec3 aRand;
 attribute vec3 aRandSecondary;
+attribute vec3 aColor;
 
 uniform float uSize;
 uniform float uTransformationFactor;
@@ -37,4 +38,6 @@ void main() {
 	
   gl_PointSize = uSize * 60.0;
   gl_PointSize *= (1.0 / -viewPosition.z);
+
+	vColor = aColor;
 }

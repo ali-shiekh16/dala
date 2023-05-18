@@ -42,7 +42,11 @@ async function getGlobeGeometry() {
   );
 
   const random = [];
-  for (let i = 0; i < earthGeometry.attributes.position.array.length / 3; i++)
+  for (
+    let i = 0;
+    i < earthGeometry.attributes.position.array.length / 3;
+    i += 3
+  )
     random.push(Math.random(), Math.random(), Math.random());
 
   geometry.setAttribute(
@@ -79,12 +83,30 @@ async function getBrainGeometry() {
   );
 
   const random = [];
-  for (let i = 0; i < brain.geometry.attributes.position.array.length / 3; i++)
+  const colors = [];
+
+  const q = ['pink', 'red', 'red', 'red', 'maroon', 'maroon', 'maroon'];
+
+  const color = new THREE.Color();
+  for (
+    let i = 0;
+    i < brain.geometry.attributes.position.array.length / 3;
+    i++
+  ) {
     random.push(Math.random(), Math.random(), Math.random());
+
+    color.set(q[THREE.MathUtils.randInt(0, q.length - 1)]);
+    colors.push(color.r, color.g, color.b);
+  }
 
   geometry.setAttribute(
     'aRand',
     new THREE.Float32BufferAttribute(new Float32Array(random), 3)
+  );
+
+  geometry.setAttribute(
+    'aColor',
+    new THREE.Float32BufferAttribute(new Float32Array(colors), 3)
   );
 
   return geometry;
@@ -123,8 +145,8 @@ async function renderObjects() {
   );
 
   geometry.setAttribute(
-    'aRandSecondary',
-    new THREE.BufferAttribute(globeGeometry.attributes.aRand.array, 3)
+    'aColor',
+    new THREE.BufferAttribute(brainGeometry.attributes.aColor.array, 3)
   );
 
   const material = new THREE.ShaderMaterial({
