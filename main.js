@@ -2,15 +2,15 @@ import './style.scss';
 import * as THREE from 'three';
 import camera, { updateCamera } from './camera';
 import configs from './configuration';
-import renderer, { handleFullScreen, updateRenderer } from './renderer';
+import renderer, { updateRenderer } from './renderer';
 import scene from './scene';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler';
 import frag from './shaders/frag.glsl';
 import vert from './shaders/vert.glsl';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/src/ScrollTrigger';
+import loadObject from './loadObject';
+import Brain from './brain';
 
 import dat from 'dat.gui';
 
@@ -57,77 +57,17 @@ async function getGlobeGeometry() {
   return geometry;
 }
 
-async function getBrainGeometry() {
-  const group = await loadObject('brain.glb');
-
-  const brain = group.children[0];
-
-  // console.log(brain);
-
-  const scale = 2000;
-  brain.geometry.scale(scale, scale, scale);
-
-  const geometry = new THREE.BufferGeometry();
-
-  geometry.setAttribute(
-    'position',
-    new THREE.Float32BufferAttribute(
-      brain.geometry.attributes.position.array,
-      3
-    )
-  );
-
-  geometry.setAttribute(
-    'normal',
-    new THREE.Float32BufferAttribute(brain.geometry.attributes.normal.array, 3)
-  );
-
-  const random = [];
-  const colors = [];
-
-  const q = ['pink', 'red', 'red', 'red', 'maroon', 'maroon', 'maroon'];
-
-  const color = new THREE.Color();
-  for (
-    let i = 0;
-    i < brain.geometry.attributes.position.array.length / 3;
-    i++
-  ) {
-    random.push(Math.random(), Math.random(), Math.random());
-
-    color.set(q[THREE.MathUtils.randInt(0, q.length - 1)]);
-    colors.push(color.r, color.g, color.b);
-  }
-
-  geometry.setAttribute(
-    'aRand',
-    new THREE.Float32BufferAttribute(new Float32Array(random), 3)
-  );
-
-  geometry.setAttribute(
-    'aColor',
-    new THREE.Float32BufferAttribute(new Float32Array(colors), 3)
-  );
-
-  return geometry;
-}
-
 async function renderObjects() {
   const globeGeometry = await getGlobeGeometry();
 
-  const brainGeometry = await getBrainGeometry();
+  const brain = new Brain('./brain.glb');
+  await brain.init();
 
   const geometry = new THREE.BufferGeometry();
 
-  geometry.setAttribute(
-    'position',
-    new THREE.BufferAttribute(brainGeometry.attributes.position.array, 3)
-  );
+  geometry.setAttribute('position', brain.position);
 
-  geometry.setAttribute(
-    'normal',
-    new THREE.BufferAttribute(brainGeometry.attributes.normal.array, 3)
-  );
+  geometry.setAttribute('normal', brain.normal);
 
   geometry.setAttribute(
     'secondaryPosition',
@@ -139,15 +79,9 @@ async function renderObjects() {
     new THREE.BufferAttribute(globeGeometry.attributes.normal.array, 3)
   );
 
-  geometry.setAttribute(
-    'aRand',
-    new THREE.BufferAttribute(brainGeometry.attributes.aRand.array, 3)
-  );
+  geometry.setAttribute('aRand', brain.randomPosition);
 
-  geometry.setAttribute(
-    'aColor',
-    new THREE.BufferAttribute(brainGeometry.attributes.aColor.array, 3)
-  );
+  geometry.setAttribute('aColor', brain.color);
 
   const material = new THREE.ShaderMaterial({
     extensions: {
@@ -175,7 +109,6 @@ async function renderObjects() {
 
   gsap.registerPlugin(ScrollTrigger);
 
-  let section = 0;
   gsap
     .timeline({
       ease: 'slow',
@@ -251,23 +184,6 @@ async function renderObjects() {
     .to(points.position, {
       x: 0,
     });
-  // .to(points.position, {
-  //   x: 0,
-  // });
-  // .to(points.position, {
-  //   x: 0,
-  //   y: 0,
-  // });
-
-  // .to(points.position, {
-  //   x: 0,
-  //   scrollTrigger: {
-  //     trigger: '#section-2',
-  //     start: 'top top',
-  //     scrub: 4,
-  //     markers: true,
-  //   },
-  // });
 
   const gui = new dat.GUI();
   gui
@@ -309,15 +225,3 @@ window.addEventListener('resize', () => {
   updateRenderer(sizes.width, sizes.height);
   renderer.render(scene, camera);
 });
-
-async function loadObject(url) {
-  let model = null;
-  try {
-    const loader = new GLTFLoader();
-    model = await loader.loadAsync(url);
-  } catch (ex) {
-    console.log(ex.message);
-  }
-
-  return model.scene.children[0];
-}
