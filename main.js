@@ -9,8 +9,10 @@ import frag from './shaders/frag.glsl';
 import vert from './shaders/vert.glsl';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/src/ScrollTrigger';
-import loadObject from './loadObject';
 import Brain from './brain';
+import Globe from './globe';
+import Robot from './robot';
+import Galaxy from './Galaxy';
 
 import dat from 'dat.gui';
 
@@ -18,70 +20,28 @@ const { sizes } = configs;
 
 renderObjects();
 
-async function getGlobeGeometry() {
-  // land shell
-  const earth = await loadObject('/map1.glb');
-
-  const earthGeometry = earth.geometry;
-
-  const scale = 150;
-  earthGeometry.scale(scale, scale, scale);
-
-  earthGeometry.translate(0, 0, 10);
-
-  const geometry = new THREE.BufferGeometry();
-
-  geometry.setAttribute(
-    'position',
-    new THREE.Float32BufferAttribute(earthGeometry.attributes.position.array, 3)
-  );
-
-  geometry.setAttribute(
-    'normal',
-    new THREE.Float32BufferAttribute(earthGeometry.attributes.normal.array, 3)
-  );
-
-  const random = [];
-  for (
-    let i = 0;
-    i < earthGeometry.attributes.position.array.length / 3;
-    i += 3
-  )
-    random.push(Math.random(), Math.random(), Math.random());
-
-  geometry.setAttribute(
-    'aRand',
-    new THREE.Float32BufferAttribute(new Float32Array(random), 3)
-  );
-
-  return geometry;
-}
-
 async function renderObjects() {
-  const globeGeometry = await getGlobeGeometry();
+  const globe = new Globe('./map1.glb');
+  await globe.init();
 
   const brain = new Brain('./brain.glb');
   await brain.init();
 
+  // const robot = new Robot('./Robot.glb');
+  // await robot.init();
+
+  const galaxy = new Galaxy('./galaxy.glb');
+  await galaxy.init();
+
   const geometry = new THREE.BufferGeometry();
 
   geometry.setAttribute('position', brain.position);
-
   geometry.setAttribute('normal', brain.normal);
-
-  geometry.setAttribute(
-    'secondaryPosition',
-    new THREE.BufferAttribute(globeGeometry.attributes.position.array, 3)
-  );
-
-  geometry.setAttribute(
-    'secondaryNormal',
-    new THREE.BufferAttribute(globeGeometry.attributes.normal.array, 3)
-  );
-
   geometry.setAttribute('aRand', brain.randomPosition);
-
   geometry.setAttribute('aColor', brain.color);
+
+  geometry.setAttribute('secondaryPosition', globe.position);
+  geometry.setAttribute('secondaryNormal', globe.normal);
 
   const material = new THREE.ShaderMaterial({
     extensions: {

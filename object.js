@@ -2,7 +2,7 @@ import loadObject from './loadObject';
 import { MathUtils, Float32BufferAttribute, Color } from 'three';
 
 export default class MeshObject {
-  geometry = 'programming is frustating';
+  geometry = null;
 
   normal = null;
   position = null;
@@ -24,10 +24,10 @@ export default class MeshObject {
   }
 
   async _setGeometry(meshPath) {
-    const geometry = await loadObject(meshPath);
-    this.geometry = geometry;
+    const mesh = await loadObject(meshPath);
+    this.geometry = mesh.geometry;
 
-    return this.geometry;
+    return mesh;
   }
 
   #setPosition() {
@@ -38,6 +38,8 @@ export default class MeshObject {
   }
 
   #setNormal() {
+    if (!this.geometry.attributes.normal) return;
+
     this.normal = new Float32BufferAttribute(
       this.geometry.attributes.normal.array,
       3

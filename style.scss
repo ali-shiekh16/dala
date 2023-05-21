@@ -1,3 +1,6 @@
+@use './css/mixins';
+@use './css/components/button';
+
 $color-bg: #0c0c0c;
 $color-body: #fff;
 
@@ -23,19 +26,19 @@ body {
 }
 
 h1 {
-  font-size: 8rem;
+  font-size: 6rem;
   margin-bottom: 3.5rem;
 }
 
 h2 {
-  font-size: 5rem;
+  font-size: 4rem;
   margin-bottom: 2.5rem;
 }
 
-p {
+p,
+li {
   font-size: 1.6rem;
   line-height: 1.8;
-  margin-bottom: 1.5rem;
 }
 
 canvas {
@@ -46,33 +49,188 @@ canvas {
 }
 
 .section {
-  height: 100vh;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
 
-  .content {
-    padding: 2rem 4rem;
-  }
-
-  &__2,
-  &__4 {
-    .content {
-      order: 1;
+  &__3 {
+    .text {
+      text-align: center;
     }
   }
 
-  &__3 {
-    padding: 4rem 15rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  &__7 {
+    text-align: center;
+    &__heading {
+      text-align: left;
+    }
+  }
+
+  .empty {
+    background: #000;
+  }
+}
+
+.investors {
+  &__list {
+    list-style: none;
+    margin-top: 3rem;
+  }
+
+  &__item {
+    font-size: 2.8rem;
+    @include mixins.min-width(medium) {
+      padding: 0 8rem;
+    }
+
+    @include mixins.min-width(large) {
+      &:nth-child(even) {
+        text-align: right;
+      }
+    }
+  }
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  $filter-intensity: 50px;
+  backdrop-filter: blur($filter-intensity);
+  -webkit-backdrop-filter: blur($filter-intensity);
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+
+  &__logo {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+
+  .nav__item {
+    list-style: none;
+    margin: 2rem;
+    text-transform: uppercase;
+    font-size: 1.4rem;
+  }
+
+  @include mixins.min-width(medium) {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 2rem;
     align-items: center;
 
-    .text {
-      text-align: center;
-      font-weight: bold;
-      font-size: 2.5rem;
+    .nav__list {
+      display: flex;
+    }
+  }
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  border-top: solid rgba(#fff, 0.2) 1px;
+  $filter-intensity: 50px;
+  backdrop-filter: blur($filter-intensity);
+  -webkit-backdrop-filter: blur($filter-intensity);
+
+  &__logo {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  &__item {
+    list-style: none;
+    margin: 2rem;
+    text-transform: uppercase;
+    font-size: 1.4rem;
+  }
+
+  &__copyright {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  @include mixins.min-width(medium) {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 2rem;
+    align-items: center;
+
+    &__list {
+      display: flex;
+    }
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  h1 {
+    font-size: 8rem;
+    margin-bottom: 3.5rem;
+  }
+
+  h2 {
+    font-size: 5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  p,
+  li {
+    margin-bottom: 1.5rem;
+  }
+
+  .section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: center;
+
+    .empty {
+      display: block;
+    }
+
+    &__2,
+    &__4 {
+      .content {
+        order: 1;
+      }
+    }
+
+    .content {
+      padding: 2rem 4rem;
+    }
+
+    &__3 {
+      padding: 4rem 15rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      .text {
+        font-weight: bold;
+        font-size: 1.8rem;
+      }
+    }
+
+    &__7 {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+  }
+}
+
+@media only screen and (min-width: 1080) {
+  .section {
+    &__3 {
+      .text {
+        font-size: 2.8rem;
+      }
     }
   }
 }
