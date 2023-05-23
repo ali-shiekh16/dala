@@ -21,17 +21,17 @@ const { sizes } = configs;
 renderObjects();
 
 async function renderObjects() {
-  const globe = new Globe('./map1.glb');
+  const globe = new Globe('./globe.glb');
   await globe.init();
 
   const brain = new Brain('./brain.glb');
   await brain.init();
 
-  // const robot = new Robot('./Robot.glb');
-  // await robot.init();
+  const robot = new Robot('./Robot.glb');
+  await robot.init();
 
-  const galaxy = new Galaxy('./galaxy.glb');
-  await galaxy.init();
+  // const galaxy = new Galaxy('./galaxy.glb');
+  // await galaxy.init();
 
   const geometry = new THREE.BufferGeometry();
 
@@ -40,8 +40,8 @@ async function renderObjects() {
   geometry.setAttribute('aRand', brain.randomPosition);
   geometry.setAttribute('aColor', brain.color);
 
-  geometry.setAttribute('secondaryPosition', globe.position);
-  geometry.setAttribute('secondaryNormal', globe.normal);
+  geometry.setAttribute('secondaryPosition', robot.position);
+  geometry.setAttribute('secondaryNormal', robot.normal);
 
   const material = new THREE.ShaderMaterial({
     extensions: {
