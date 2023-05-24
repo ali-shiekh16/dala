@@ -18,8 +18,9 @@ export default class MeshObject {
 
   async init() {
     await this._setGeometry(this.meshPath);
+    this._setNormal();
+
     this.#setPosition();
-    this.#setNormal();
     this.#setColorsAndRandPosition();
   }
 
@@ -30,18 +31,19 @@ export default class MeshObject {
     return mesh;
   }
 
-  #setPosition() {
-    this.position = new Float32BufferAttribute(
-      this.geometry.attributes.position.array,
+  _setNormal() {
+    if (!this.geometry.attributes?.normal?.array?.length)
+      throw new Error('Normals undefined');
+
+    this.normal = new Float32BufferAttribute(
+      this.geometry.attributes.normal.array,
       3
     );
   }
 
-  #setNormal() {
-    if (!this.geometry.attributes.normal) return;
-
-    this.normal = new Float32BufferAttribute(
-      this.geometry.attributes.normal.array,
+  #setPosition() {
+    this.position = new Float32BufferAttribute(
+      this.geometry.attributes.position.array,
       3
     );
   }

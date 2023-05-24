@@ -12,7 +12,7 @@ import { ScrollTrigger } from 'gsap/src/ScrollTrigger';
 import Brain from './brain';
 import Globe from './globe';
 import Robot from './robot';
-import Galaxy from './Galaxy';
+import Galaxy from './galaxy';
 
 import dat from 'dat.gui';
 
@@ -30,18 +30,19 @@ async function renderObjects() {
   const robot = new Robot('./Robot.glb');
   await robot.init();
 
-  // const galaxy = new Galaxy('./galaxy.glb');
-  // await galaxy.init();
+  const galaxy = new Galaxy('./Galaxy.glb');
+  await galaxy.init();
+  console.log(galaxy);
 
   const geometry = new THREE.BufferGeometry();
 
-  geometry.setAttribute('position', brain.position);
-  geometry.setAttribute('normal', brain.normal);
-  geometry.setAttribute('aRand', brain.randomPosition);
-  geometry.setAttribute('aColor', brain.color);
+  geometry.setAttribute('position', galaxy.position);
+  geometry.setAttribute('normal', galaxy.normal);
+  geometry.setAttribute('aRand', galaxy.randomPosition);
+  geometry.setAttribute('aColor', galaxy.color);
 
-  geometry.setAttribute('secondaryPosition', robot.position);
-  geometry.setAttribute('secondaryNormal', robot.normal);
+  geometry.setAttribute('secondaryPosition', globe.position);
+  geometry.setAttribute('secondaryNormal', globe.normal);
 
   const material = new THREE.ShaderMaterial({
     extensions: {
@@ -51,7 +52,7 @@ async function renderObjects() {
     vertexShader: vert,
     fragmentShader: frag,
     uniforms: {
-      uSize: { value: 50 },
+      uSize: { value: 25 },
       uTexture: { value: new THREE.TextureLoader().load('/triangle.png') },
       uColor: { value: new THREE.Vector3(1, 0, 0) },
       uTransformationFactor: { value: 0 },
@@ -62,8 +63,9 @@ async function renderObjects() {
   });
 
   const points = new THREE.Points(geometry, material);
-  points.rotateY(-Math.PI / 2);
-  points.position.setX(150);
+  // points.rotateY(-Math.PI / 2);
+  // points.position.setX(150);
+  // points.rotateY(Math.PI / 4);
 
   scene.add(points);
 
