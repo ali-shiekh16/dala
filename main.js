@@ -61,7 +61,7 @@ function animate(particles) {
   timeline.to(
     particles.cloud.rotation,
     {
-      y: Math.PI / 2,
+      x: -Math.PI / 10,
     },
     '<'
   );
@@ -73,7 +73,7 @@ function animate(particles) {
   timeline.to(
     particles.cloud.rotation,
     {
-      y: -Math.PI / 10,
+      x: -Math.PI / 10,
     },
     '<'
   );
@@ -155,7 +155,7 @@ function animate(particles) {
   timeline.to(
     particles.cloud.rotation,
     {
-      y: -Math.PI / 3,
+      y: Math.PI / 2,
     },
     '<'
   );
