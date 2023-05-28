@@ -11,10 +11,14 @@ import Globe from './globe';
 import Robot from './robot';
 import Galaxy from './galaxy';
 import ParticleCloud from './particlesCloud';
+import { MathUtils } from 'three';
 
 const { sizes } = configs;
+const mouse = { x: 0, y: 0 };
+let cloud = null;
 
 renderObjects().then(particles => {
+  cloud = particles.cloud;
   animate(particles);
 });
 
@@ -31,13 +35,10 @@ async function renderObjects() {
   const galaxy = new Galaxy('./Galaxy.glb');
   await galaxy.init();
 
-  // const objects = [galaxy, globe, robot, brain];
   const objects = [galaxy, globe, brain, robot];
 
   const particles = new ParticleCloud(objects);
   scene.add(particles.cloud);
-
-  console.log(particles.geometry.attributes);
 
   return particles;
 }
@@ -190,6 +191,22 @@ renderer.render(scene, camera);
 
 function tick() {
   controls.update();
+
+  if (cloud) {
+    camera.rotation.y = MathUtils.lerp(
+      camera.rotation.y,
+      (mouse.x * Math.PI) / 20,
+      0.1
+    );
+    camera.rotation.x = MathUtils.lerp(
+      camera.rotation.x,
+      (mouse.y * Math.PI) / 20,
+      0.1
+    );
+
+    // camera.lookAt(cloud.position);
+  }
+
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
@@ -203,4 +220,9 @@ window.addEventListener('resize', () => {
   updateCamera(sizes.width, sizes.height);
   updateRenderer(sizes.width, sizes.height);
   renderer.render(scene, camera);
+});
+
+window.addEventListener('mousemove', e => {
+  mouse.x = 1 - 2 * (e.clientX / window.innerWidth);
+  mouse.y = 1 - 2 * (e.clientY / window.innerHeight);
 });
