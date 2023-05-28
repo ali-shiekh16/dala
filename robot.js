@@ -10,12 +10,13 @@ import scene from './scene';
 export default class Robot extends MeshObject {
   async _setGeometry(meshPath) {
     const group = await super._setGeometry(meshPath);
-    console.log(group);
 
     this.geometry = group.geometry;
-    const scale = 150;
 
+    const scale = 80;
     this.geometry.scale(scale, scale, scale);
+    this.geometry.rotateZ(-Math.PI / 2);
+    this.geometry.rotateX(-Math.PI / 2);
 
     // let positions = [];
     // let normals = [];

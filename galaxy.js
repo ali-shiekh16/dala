@@ -10,10 +10,9 @@ export default class Galaxy extends MeshObject {
 
     const scale = 5;
     this.geometry.scale(scale, scale, scale);
-    // this.geometry.rotateY(Math.PI * 0.5);
   }
 
   _setNormal() {
-    this.normal = new Float32BufferAttribute([], 3);
+    this.normal = new Float32BufferAttribute(new Array(13180 * 3).fill(0), 3);
   }
 }
