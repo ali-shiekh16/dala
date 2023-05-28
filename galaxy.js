@@ -8,7 +8,7 @@ export default class Galaxy extends MeshObject {
 
     this.geometry = galaxy.geometry;
 
-    const scale = 5;
+    const scale = 4;
     this.geometry.scale(scale, scale, scale);
   }
 
