@@ -10,7 +10,7 @@ export default class MeshObject {
   color = null;
   randomPosition = null;
 
-  #meshPath = null;
+  uv = null;
 
   constructor(meshPath) {
     this.meshPath = meshPath;
@@ -22,6 +22,7 @@ export default class MeshObject {
 
     this.#setPosition();
     this.#setColorsAndRandPosition();
+    this.#setUV();
   }
 
   async _setGeometry(meshPath) {
@@ -46,6 +47,14 @@ export default class MeshObject {
       this.geometry.attributes.position.array,
       3
     );
+  }
+
+  #setUV() {
+    if (this.geometry.attributes.uv)
+      this.uv = new Float32BufferAttribute(
+        this.geometry.attributes.uv.array,
+        3
+      );
   }
 
   #setColorsAndRandPosition() {

@@ -9,6 +9,7 @@ import frag from './shaders/frag.glsl';
 import vert from './shaders/vert.glsl';
 
 import dat from 'dat.gui';
+import TouchTexture from './touchTextures';
 
 export default class ParticleCloud {
   objects = [];
@@ -26,6 +27,8 @@ export default class ParticleCloud {
 
     this.#setGeometry();
 
+    this.#initTouch();
+
     this.cloud = new Points(this.geometry, this.material);
 
     this.#createDebugger();
@@ -38,6 +41,7 @@ export default class ParticleCloud {
         this.geometry.setAttribute('normal', object.normal);
         this.geometry.setAttribute('aRand', object.randomPosition);
         this.geometry.setAttribute('aColor', object.color);
+        this.geometry.setAttribute('uv', object.uv);
 
         return;
       }
@@ -63,10 +67,31 @@ export default class ParticleCloud {
         uTexture: { value: new TextureLoader().load('/triangle.png') },
         uColor: { value: new Vector3(1, 0, 0) },
         uDestruction: { value: 0 },
+        uPoint: { value: { x: 0, y: 0, z: 0 } },
+        uTouch: { value: null },
+        uTime: { value: 0 },
       },
       depthTest: false,
       transparent: true,
     });
+  }
+
+  #initTouch() {
+    // create only once
+    if (!this.touch) this.touch = new TouchTexture(this);
+    this.material.uniforms.uTouch.value = this.touch.texture;
+  }
+
+  update(delta) {
+    if (!this.cloud) return;
+    if (this.touch) this.touch.update();
+
+    this.material.uniforms.uTime.value += delta;
+  }
+
+  onInteractiveMove(e) {
+    const uv = e.intersectionData.uv;
+    if (this.touch) this.touch.addTouch(uv);
   }
 
   #createDebugger() {

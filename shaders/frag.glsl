@@ -2,6 +2,8 @@
 uniform sampler2D uTexture;
 uniform vec3 uColor;
 
+uniform sampler2D uTouch;
+
 varying vec3 vColor;
 varying float vVisible;
 

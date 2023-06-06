@@ -1,6 +1,5 @@
 import { Float32BufferAttribute } from 'three';
 import MeshObject from './object';
-import scene from './scene';
 
 export default class Galaxy extends MeshObject {
   async _setGeometry(meshPath) {

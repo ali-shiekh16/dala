@@ -11,15 +11,26 @@ import Globe from './globe';
 import Robot from './robot';
 import Galaxy from './galaxy';
 import ParticleCloud from './particlesCloud';
-import { MathUtils } from 'three';
+import {
+  MathUtils,
+  PlaneGeometry,
+  MeshBasicMaterial,
+  Mesh,
+  Vector2,
+  Raycaster,
+  Clock,
+} from 'three';
 
 const { sizes } = configs;
 const mouse = { x: 0, y: 0 };
 let cloud = null;
+let particles = null;
 
-renderObjects().then(particles => {
-  cloud = particles.cloud;
-  animate(particles);
+renderObjects().then(particleSys => {
+  particles = particleSys;
+  cloud = particleSys.cloud;
+
+  animate(particleSys);
 });
 
 async function renderObjects() {
@@ -35,7 +46,8 @@ async function renderObjects() {
   const galaxy = new Galaxy('./Galaxy.glb');
   await galaxy.init();
 
-  const objects = [galaxy, globe, brain, robot];
+  // const objects = [galaxy, globe, brain, robot];
+  const objects = [brain, globe, brain, globe];
 
   const particles = new ParticleCloud(objects);
   scene.add(particles.cloud);
@@ -186,32 +198,54 @@ function animate(particles) {
   });
 }
 
+const planeSize = 500;
+const plane = new Mesh(
+  new PlaneGeometry(planeSize * 2, planeSize),
+  new MeshBasicMaterial({ color: '#000' })
+);
+scene.add(plane);
+
 const controls = new OrbitControls(camera, renderer.domElement);
 renderer.render(scene, camera);
 
+const pointer = new Vector2();
+const raycaster = new Raycaster();
+
+const clock = new Clock();
 function tick() {
+  const delta = clock.getElapsedTime();
   controls.update();
 
-  if (cloud) {
-    camera.rotation.y = MathUtils.lerp(
-      camera.rotation.y,
-      (mouse.x * Math.PI) / 20,
-      0.1
-    );
-    camera.rotation.x = MathUtils.lerp(
-      camera.rotation.x,
-      (mouse.y * Math.PI) / 20,
-      0.1
-    );
+  raycaster.setFromCamera(pointer, camera);
 
-    // camera.lookAt(cloud.position);
+  if (particles) {
+    const intersectionData = raycaster.intersectObject(plane)[0];
+    particles.onInteractiveMove({ intersectionData });
+    particles.update(delta);
+
+    cloud.material.uniforms.uPoint.value = intersectionData.point;
   }
+
+  if (cloud) animateCamera();
 
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
 
 tick();
+
+function animateCamera() {
+  camera.rotation.y = MathUtils.lerp(
+    camera.rotation.y,
+    (mouse.x * Math.PI) / 20,
+    0.1
+  );
+  camera.rotation.x = MathUtils.lerp(
+    camera.rotation.x,
+    (mouse.y * Math.PI) / 20,
+    0.1
+  );
+}
 
 window.addEventListener('resize', () => {
   sizes.width = window.innerWidth;
@@ -225,4 +259,7 @@ window.addEventListener('resize', () => {
 window.addEventListener('mousemove', e => {
   mouse.x = 1 - 2 * (e.clientX / window.innerWidth);
   mouse.y = 1 - 2 * (e.clientY / window.innerHeight);
+
+  pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
 });

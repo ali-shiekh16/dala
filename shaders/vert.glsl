@@ -1,3 +1,4 @@
+
 attribute vec3 position2;
 attribute vec3 position3;
 attribute vec3 position4;
@@ -10,7 +11,6 @@ attribute vec3 aRand;
 attribute vec3 aRandSecondary;
 attribute vec3 aColor;
 
-
 uniform float uMorph2;
 uniform float uMorph3;
 uniform float uMorph4;
@@ -18,6 +18,10 @@ uniform float uMorph4;
 uniform float uSize;
 uniform float uDestruction;
 
+uniform sampler2D uTouch;
+uniform float uTime;
+
+uniform vec3 uPoint;
 
 varying vec3 vColor;
 varying float vVisible;
@@ -41,9 +45,20 @@ void main() {
 	modelPosition.xyz += aRand.xyz * 850.0 * uDestruction;
 
 
+
+
+	// modelPosition.z += t * 500.0;
+	// modelPosition.x += cos(90.0) * t * 500.0 ;
+	// modelPosition.y += sin(90.0) * t * 500.0 ;
+
+	// displaced.z += t * 20.0 * rndz;
+	// displaced.x += cos(angle) * t * 20.0 * rndz;
+	// displaced.y += sin(angle) * t * 20.0 * rndz;
+
+
+
 	vec4 viewPosition = viewMatrix * modelPosition;
 	vec4 projectedPosition = projectionMatrix * viewPosition;
-
 
 	gl_Position = projectedPosition;
 
@@ -59,8 +74,20 @@ void main() {
 	if(currentNormal == vec3(0.0, 0.0, 0.0))
 	vVisible = -1.0;
 	
-  gl_PointSize = uSize * 60.0;
+	float distanceToMouse =  length(uPoint.xy - modelPosition.xy) ;
+	float t = texture2D(uTouch, uv).r;
+	if(distanceToMouse <= 60.0)
+	{
+		gl_PointSize = mix(uSize * 250.0, uSize * 60.0, distanceToMouse / 60.0);
+		vColor = mix(vec3(1.0, 1.0, 1.0), aColor, distanceToMouse / 60.0);
+	}
+	else
+	{
+		gl_PointSize = uSize * 60.0;
+		vColor = aColor;
+	}
+
   gl_PointSize *= (1.0 / -viewPosition.z);
 
-	vColor = aColor;
+
 }
