@@ -46,8 +46,8 @@ async function renderObjects() {
   const galaxy = new Galaxy('./Galaxy.glb');
   await galaxy.init();
 
-  // const objects = [galaxy, globe, brain, robot];
-  const objects = [brain, globe, brain, globe];
+  const objects = [galaxy, globe, brain, robot];
+  // const objects = [brain, globe, brain, globe];
 
   const particles = new ParticleCloud(objects);
   scene.add(particles.cloud);
@@ -220,8 +220,8 @@ function tick() {
 
   if (particles) {
     const intersectionData = raycaster.intersectObject(plane)[0];
-    particles.onInteractiveMove({ intersectionData });
-    particles.update(delta);
+    // particles.onInteractiveMove({ intersectionData });
+    // particles.update(delta);
 
     cloud.material.uniforms.uPoint.value = intersectionData.point;
   }
