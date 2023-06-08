@@ -34,6 +34,9 @@ renderObjects().then(particleSys => {
 });
 
 async function renderObjects() {
+  const galaxy = new Galaxy('./Galaxy.glb');
+  await galaxy.init();
+
   const globe = new Globe('./globe.glb');
   await globe.init();
 
@@ -43,11 +46,8 @@ async function renderObjects() {
   const robot = new Robot('./Robot.glb');
   await robot.init();
 
-  const galaxy = new Galaxy('./Galaxy.glb');
-  await galaxy.init();
-
   const objects = [galaxy, globe, brain, robot];
-  // const objects = [brain, globe, brain, globe];
+  // const objects = [robot, brain, globe, galaxy];
 
   const particles = new ParticleCloud(objects);
   scene.add(particles.cloud);
@@ -198,9 +198,9 @@ function animate(particles) {
   });
 }
 
-const planeSize = 500;
+const planeSize = 800;
 const plane = new Mesh(
-  new PlaneGeometry(planeSize * 2, planeSize),
+  new PlaneGeometry(planeSize * 4, planeSize),
   new MeshBasicMaterial({ color: '#000' })
 );
 scene.add(plane);
@@ -220,8 +220,6 @@ function tick() {
 
   if (particles) {
     const intersectionData = raycaster.intersectObject(plane)[0];
-    // particles.onInteractiveMove({ intersectionData });
-    // particles.update(delta);
 
     cloud.material.uniforms.uPoint.value = intersectionData.point;
   }

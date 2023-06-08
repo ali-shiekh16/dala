@@ -7,11 +7,11 @@ export default class Galaxy extends MeshObject {
 
     this.geometry = galaxy.geometry;
 
-    const scale = 0.25;
+    const scale = 0.2;
     this.geometry.scale(scale, scale, scale);
   }
 
   _setNormal() {
-    this.normal = new Float32BufferAttribute(new Array(13180 * 3).fill(0), 3);
+    this.normal = new Float32BufferAttribute(new Array(21520 * 3).fill(0), 3);
   }
 }

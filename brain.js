@@ -6,7 +6,7 @@ export default class Brain extends MeshObject {
 
     const brain = group.children[0];
 
-    const scale = 2000;
+    const scale = 2500;
     brain.geometry.scale(scale, scale, scale);
     this.geometry = brain.geometry;
   }

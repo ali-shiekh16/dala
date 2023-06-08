@@ -33,18 +33,45 @@ export default class MeshObject {
   }
 
   _setNormal() {
-    if (!this.geometry.attributes?.normal?.array?.length)
-      throw new Error('Normals undefined');
+    // if (!this.geometry.attributes?.normal?.array?.length)
+    //   throw new Error('Normals undefined');
 
-    this.normal = new Float32BufferAttribute(
-      this.geometry.attributes.normal.array,
-      3
-    );
+    // this.normal = new Float32BufferAttribute(
+    //   this.geometry.attributes.normal.array,
+    //   3
+    // );
+
+    let newNormal = [];
+    if (this.geometry.attributes.normal.array.length < 21520 * 3) {
+      newNormal = [
+        ...this.geometry.attributes.normal.array,
+        ...new Array(
+          21520 * 3 - this.geometry.attributes.normal.array.length
+        ).fill(0),
+      ];
+
+      this.normal = new Float32BufferAttribute(
+        newNormal.length ? newNormal : this.geometry.attributes.normal.array,
+        3
+      );
+    }
   }
 
   #setPosition() {
+    let newPosition = [];
+    if (this.geometry.attributes.position.array.length < 21520 * 3) {
+      newPosition = [
+        ...this.geometry.attributes.position.array,
+        ...new Array(
+          21520 * 3 - this.geometry.attributes.position.array.length
+        ).fill(0),
+      ];
+    }
+
     this.position = new Float32BufferAttribute(
-      this.geometry.attributes.position.array,
+      newPosition.length
+        ? newPosition
+        : this.geometry.attributes.position.array,
       3
     );
   }
