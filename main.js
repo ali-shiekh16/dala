@@ -74,7 +74,7 @@ function animate(particles) {
   timeline.to(
     particles.cloud.rotation,
     {
-      x: -Math.PI / 10,
+      z: -Math.PI / 10,
     },
     '<'
   );
@@ -82,6 +82,14 @@ function animate(particles) {
   timeline.to(particles.cloud.position, {
     x: 0,
   });
+
+  timeline.to(
+    particles.cloud.rotation,
+    {
+      z: Math.PI / 10,
+    },
+    '<'
+  );
 
   timeline.to(
     particles.cloud.rotation,
@@ -113,6 +121,7 @@ function animate(particles) {
     particles.material.uniforms.uDestruction,
     {
       value: 0,
+      duration: 0.5,
     },
     '<'
   );
@@ -145,30 +154,22 @@ function animate(particles) {
     value: 1,
   });
 
-  timeline.to(
-    particles.cloud.position,
-    {
-      x: 150,
-    },
-    '<'
-  );
-
-  timeline.to(
-    particles.cloud.rotation,
-    {
-      y: Math.PI / 2,
-    },
-    '<'
-  );
-
   timeline.to(particles.cloud.position, {
-    x: -200,
+    x: 150,
   });
 
   timeline.to(
     particles.cloud.rotation,
     {
       y: Math.PI / 2,
+    },
+    '<'
+  );
+
+  timeline.to(
+    particles.cloud.rotation,
+    {
+      z: 0,
     },
     '<'
   );
@@ -176,6 +177,14 @@ function animate(particles) {
   timeline.to(particles.material.uniforms.uDestruction, {
     value: 1,
   });
+
+  timeline.to(
+    particles.cloud.position,
+    {
+      x: -200,
+    },
+    '<'
+  );
 
   timeline.to(particles.material.uniforms.uMorph4, {
     value: 1,
@@ -190,8 +199,17 @@ function animate(particles) {
   );
 
   timeline.to(particles.cloud.position, {
-    x: 50,
+    x: 150,
   });
+
+  timeline.to(
+    particles.cloud.rotation,
+    {
+      y: Math.PI * 3.1,
+      x: 0,
+    },
+    '<'
+  );
 
   timeline.to(particles.cloud.position, {
     x: -150,

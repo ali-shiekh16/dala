@@ -10,5 +10,7 @@ export default class Robot extends MeshObject {
     this.geometry.scale(scale, scale, scale);
     this.geometry.rotateZ(-Math.PI / 2);
     this.geometry.rotateX(-Math.PI / 2);
+
+    
   }
 }
