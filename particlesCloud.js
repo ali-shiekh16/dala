@@ -59,7 +59,7 @@ export default class ParticleCloud {
       vertexShader: vert,
       fragmentShader: frag,
       uniforms: {
-        uSize: { value: 100 },
+        uSize: { value: 45 },
         uTexture: { value: new TextureLoader().load('/triangle.png') },
         uColor: { value: new Vector3(1, 0, 0) },
         uDestruction: { value: 0 },

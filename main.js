@@ -52,6 +52,7 @@ async function renderObjects() {
 
   const particles = new ParticleCloud(objects);
   particles.cloud.position.x = 300;
+  particles.cloud.rotation.y = Math.PI / 2.5;
 
   scene.add(particles.cloud);
 
@@ -121,15 +122,9 @@ function animate(particles) {
     '<'
   );
 
-  timeline.fromTo(
-    particles.cloud.rotation,
-    {
-      y: 0,
-    },
-    {
-      y: Math.PI,
-    }
-  );
+  timeline.to(particles.cloud.rotation, {
+    y: Math.PI * 3.5,
+  });
 
   timeline.to(
     particles.cloud.position,
@@ -154,7 +149,7 @@ function animate(particles) {
   timeline.to(
     particles.cloud.rotation,
     {
-      y: 0,
+      y: Math.PI * 4,
     },
     '<'
   );
