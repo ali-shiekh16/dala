@@ -3,7 +3,7 @@ import configs from './configuration';
 
 const { width, height } = configs.sizes;
 
-const camera = new PerspectiveCamera(45, width / height, 0.0001, 5000);
+const camera = new PerspectiveCamera(50, width / height, 0.0001, 5000);
 camera.position.setZ(700);
 // camera.position.setY(500);
 

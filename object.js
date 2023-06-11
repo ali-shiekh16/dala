@@ -12,8 +12,11 @@ export default class MeshObject {
 
   uv = null;
 
-  constructor(meshPath) {
+  maxVertices = 0;
+
+  constructor(meshPath, maxVertices) {
     this.meshPath = meshPath;
+    this.maxVertices = maxVertices;
   }
 
   async init() {
@@ -33,20 +36,12 @@ export default class MeshObject {
   }
 
   _setNormal() {
-    // if (!this.geometry.attributes?.normal?.array?.length)
-    //   throw new Error('Normals undefined');
-
-    // this.normal = new Float32BufferAttribute(
-    //   this.geometry.attributes.normal.array,
-    //   3
-    // );
-
     let newNormal = [];
-    if (this.geometry.attributes.normal.array.length < 21520 * 3) {
+    if (this.geometry.attributes.normal.array.length < this.maxVertices * 3) {
       newNormal = [
         ...this.geometry.attributes.normal.array,
         ...new Array(
-          21520 * 3 - this.geometry.attributes.normal.array.length
+          this.maxVertices * 3 - this.geometry.attributes.normal.array.length
         ).fill(0),
       ];
 
@@ -59,11 +54,11 @@ export default class MeshObject {
 
   #setPosition() {
     let newPosition = [];
-    if (this.geometry.attributes.position.array.length < 21520 * 3) {
+    if (this.geometry.attributes.position.array.length < this.maxVertices * 3) {
       newPosition = [
         ...this.geometry.attributes.position.array,
         ...new Array(
-          21520 * 3 - this.geometry.attributes.position.array.length
+          this.maxVertices * 3 - this.geometry.attributes.position.array.length
         ).fill(0),
       ];
     }
@@ -91,11 +86,7 @@ export default class MeshObject {
     const pallete = ['pink', 'red', 'red', 'red', 'maroon', 'maroon', 'maroon'];
 
     const color = new Color();
-    for (
-      let i = 0;
-      i < this.geometry.attributes.position.array.length / 3;
-      i++
-    ) {
+    for (let i = 0; i < this.maxVertices; i++) {
       randVertices.push(Math.random(), Math.random(), Math.random());
 
       color.set(pallete[MathUtils.randInt(0, pallete.length - 1)]);

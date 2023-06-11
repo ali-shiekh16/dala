@@ -34,22 +34,25 @@ renderObjects().then(particleSys => {
 });
 
 async function renderObjects() {
-  const galaxy = new Galaxy('./Galaxy.glb');
+  const maxVertices = 21520;
+  const galaxy = new Galaxy('./Galaxy.glb', maxVertices);
   await galaxy.init();
 
-  const globe = new Globe('./globe.glb');
+  const globe = new Globe('./globe.glb', maxVertices);
   await globe.init();
 
-  const brain = new Brain('./brain.glb');
+  const brain = new Brain('./brain.glb', maxVertices);
   await brain.init();
 
-  const robot = new Robot('./Robot.glb');
+  const robot = new Robot('./Robot.glb', maxVertices);
   await robot.init();
 
-  const objects = [galaxy, globe, brain, robot];
+  const objects = [robot, globe, brain, galaxy];
   // const objects = [robot, brain, globe, galaxy];
 
   const particles = new ParticleCloud(objects);
+  particles.cloud.position.x = 300;
+
   scene.add(particles.cloud);
 
   return particles;
@@ -74,7 +77,7 @@ function animate(particles) {
   timeline.to(
     particles.cloud.rotation,
     {
-      z: -Math.PI / 10,
+      y: Math.PI * 2.5,
     },
     '<'
   );
@@ -82,22 +85,6 @@ function animate(particles) {
   timeline.to(particles.cloud.position, {
     x: 0,
   });
-
-  timeline.to(
-    particles.cloud.rotation,
-    {
-      z: Math.PI / 10,
-    },
-    '<'
-  );
-
-  timeline.to(
-    particles.cloud.rotation,
-    {
-      x: -Math.PI / 10,
-    },
-    '<'
-  );
 
   timeline.to(particles.material.uniforms.uDestruction, {
     value: 1,
@@ -134,14 +121,20 @@ function animate(particles) {
     '<'
   );
 
-  timeline.to(particles.cloud.rotation, {
-    y: -Math.PI / 3,
-  });
+  timeline.fromTo(
+    particles.cloud.rotation,
+    {
+      y: 0,
+    },
+    {
+      y: Math.PI,
+    }
+  );
 
   timeline.to(
     particles.cloud.position,
     {
-      x: -150,
+      x: -350,
     },
     '<'
   );
@@ -161,15 +154,7 @@ function animate(particles) {
   timeline.to(
     particles.cloud.rotation,
     {
-      y: Math.PI / 2,
-    },
-    '<'
-  );
-
-  timeline.to(
-    particles.cloud.rotation,
-    {
-      z: 0,
+      y: 0,
     },
     '<'
   );
@@ -198,21 +183,20 @@ function animate(particles) {
     '<'
   );
 
-  timeline.to(particles.cloud.position, {
-    x: 150,
+  timeline.to(particles.cloud.rotation, {
+    z: Math.PI / 2,
   });
 
   timeline.to(
-    particles.cloud.rotation,
+    particles.cloud.position,
     {
-      y: Math.PI * 3.1,
-      x: 0,
+      x: 150,
     },
     '<'
   );
 
   timeline.to(particles.cloud.position, {
-    x: -150,
+    x: Math.PI / 5,
   });
 }
 
