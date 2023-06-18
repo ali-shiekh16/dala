@@ -12,6 +12,9 @@ export default class Galaxy extends MeshObject {
   }
 
   _setNormal() {
-    this.normal = new Float32BufferAttribute(new Array(21520 * 3).fill(0), 3);
+    this.normal = new Float32BufferAttribute(
+      new Array(this.maxVertices * 3).fill(0),
+      3
+    );
   }
 }
