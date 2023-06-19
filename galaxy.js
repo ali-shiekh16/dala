@@ -11,6 +11,20 @@ export default class Galaxy extends MeshObject {
     this.geometry.scale(scale, scale, scale);
   }
 
+  setPosition() {
+    let newPosition = [];
+    if (this.geometry.attributes.position.array.length < this.maxVertices * 3) {
+      newPosition = [
+        ...this.geometry.attributes.position.array,
+        ...new Array(
+          this.maxVertices * 3 - this.geometry.attributes.position.array.length
+        ).fill(0),
+      ];
+
+      this.position = new Float32BufferAttribute(newPosition, 3);
+    }
+  }
+
   _setNormal() {
     this.normal = new Float32BufferAttribute(
       new Array(this.maxVertices * 3).fill(0),

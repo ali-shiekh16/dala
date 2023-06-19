@@ -23,7 +23,7 @@ export default class MeshObject {
     await this._setGeometry(this.meshPath);
     this._setNormal();
 
-    this.#setPosition();
+    this.setPosition();
     this.#setColorsAndRandPosition();
     this.#setUV();
   }
@@ -45,14 +45,19 @@ export default class MeshObject {
         ).fill(0),
       ];
 
+      // this.normal = new Float32BufferAttribute(
+      //   newNormal.length ? newNormal : this.geometry.attributes.normal.array,
+      //   3
+      // );
+
       this.normal = new Float32BufferAttribute(
-        newNormal.length ? newNormal : this.geometry.attributes.normal.array,
+        this.geometry.attributes.normal.array,
         3
       );
     }
   }
 
-  #setPosition() {
+  setPosition() {
     let newPosition = [];
     if (this.geometry.attributes.position.array.length < this.maxVertices * 3) {
       newPosition = [
@@ -63,10 +68,15 @@ export default class MeshObject {
       ];
     }
 
+    // this.position = new Float32BufferAttribute(
+    //   newPosition.length
+    //     ? newPosition
+    //     : this.geometry.attributes.position.array,
+    //   3
+    // );
+
     this.position = new Float32BufferAttribute(
-      newPosition.length
-        ? newPosition
-        : this.geometry.attributes.position.array,
+      this.geometry.attributes.position.array,
       3
     );
   }
@@ -86,7 +96,7 @@ export default class MeshObject {
     const pallete = ['pink', 'red', 'red', 'red', 'maroon', 'maroon', 'maroon'];
 
     const color = new Color();
-    for (let i = 0; i < this.maxVertices; i++) {
+    for (let i = 0; i < this.position.array.length; i++) {
       randVertices.push(Math.random(), Math.random(), Math.random());
 
       color.set(pallete[MathUtils.randInt(0, pallete.length - 1)]);

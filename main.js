@@ -34,7 +34,7 @@ renderObjects().then(particleSys => {
 });
 
 async function renderObjects() {
-  const maxVertices = 56247;
+  const maxVertices = 48999;
   const galaxy = new Galaxy('./Galaxy.glb', maxVertices);
   await galaxy.init();
 
@@ -47,10 +47,7 @@ async function renderObjects() {
   const robot = new Robot('./Robot.glb', maxVertices);
   await robot.init();
 
-  // const objects = [robot, globe, brain, galaxy];
   const objects = [robot, brain, globe, galaxy];
-
-  // objects.forEach(obj => console.log(obj));
 
   const particles = new ParticleCloud(objects);
   particles.cloud.position.x = 300;
